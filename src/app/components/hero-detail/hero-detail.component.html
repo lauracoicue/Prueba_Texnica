@@ -1,0 +1,190 @@
+<div class="hero-detail-container">
+  <div class="container">
+    <!-- Back Button -->
+    <button (click)="goBack()" class="back-btn">
+      <svg class="back-icon" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+      </svg>
+      Volver a la lista
+    </button>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-detail">
+      <div class="spinner-detail"></div>
+      <p>Cargando detalles del superhéroe...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="error-detail">
+      {{ error }}
+      <button (click)="goBack()" class="btn btn-primary" style="margin-left: 1rem;">
+        Volver
+      </button>
+    </div>
+
+    <!-- Hero Details -->
+    <div *ngIf="!isLoading && !error && hero" class="hero-detail-card">
+      <!-- Hero Header -->
+      <div class="hero-header">
+        <div class="hero-header-content">
+          <div class="hero-image-section">
+            <img [src]="getHeroImage()" 
+                 [alt]="hero.name"
+                 class="hero-main-image"
+                 loading="eager">
+          </div>
+          
+          <div class="hero-info-section">
+            <div class="hero-badges">
+              <span class="hero-id-badge">#{{ hero.id }}</span>
+              <span class="alignment-badge">
+                {{ hero.biography.alignment === 'good' ? 'Héroe' : 'Villano' }}
+              </span>
+            </div>
+            
+            <h1 class="hero-name">{{ hero.name }}</h1>
+            <p class="hero-fullname">{{ hero.biography.fullName }}</p>
+            
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value">{{ hero.powerstats.intelligence }}</div>
+                <div class="stat-label">Inteligencia</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ hero.powerstats.strength }}</div>
+                <div class="stat-label">Fuerza</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ hero.powerstats.speed }}</div>
+                <div class="stat-label">Velocidad</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ hero.powerstats.power }}</div>
+                <div class="stat-label">Poder</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Content -->
+      <div class="hero-content">
+        <div class="content-grid">
+          <!-- Left Column - Stats -->
+          <div>
+            <!-- Power Stats -->
+            <div class="mb-8">
+              <h2 class="section-title">Estadísticas de Poder</h2>
+              <div class="power-stats-grid">
+                <div *ngFor="let stat of [
+                  {name: 'Inteligencia', value: hero.powerstats.intelligence},
+                  {name: 'Fuerza', value: hero.powerstats.strength},
+                  {name: 'Velocidad', value: hero.powerstats.speed},
+                  {name: 'Durabilidad', value: hero.powerstats.durability},
+                  {name: 'Poder', value: hero.powerstats.power},
+                  {name: 'Combate', value: hero.powerstats.combat}
+                ]" class="power-stat-item">
+                  <div class="stat-header">
+                    <span class="stat-name">{{ stat.name }}</span>
+                    <span class="stat-numeric">{{ stat.value }}</span>
+                  </div>
+                  <div class="stat-bar-container">
+                    <div class="stat-bar" 
+                         [style.width.%]="stat.value"
+                         [class.stat-green]="stat.value >= 80"
+                         [class.stat-blue]="stat.value >= 60 && stat.value < 80"
+                         [class.stat-yellow]="stat.value >= 40 && stat.value < 60"
+                         [class.stat-orange]="stat.value >= 20 && stat.value < 40"
+                         [class.stat-red]="stat.value < 20"></div>
+                  </div>
+                  <div class="stat-description">{{ getStatText(stat.value) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Biography -->
+            <div>
+              <h2 class="section-title">Biografía</h2>
+              <div class="biography-grid">
+                <div class="bio-item">
+                  <h3>Nombre Completo</h3>
+                  <p>{{ hero.biography.fullName }}</p>
+                </div>
+                <div class="bio-item">
+                  <h3>Lugar de Nacimiento</h3>
+                  <p>{{ hero.biography.placeOfBirth }}</p>
+                </div>
+                <div class="bio-item">
+                  <h3>Primera Aparición</h3>
+                  <p>{{ hero.biography.firstAppearance }}</p>
+                </div>
+                <div class="bio-item">
+                  <h3>Editorial</h3>
+                  <p>{{ hero.biography.publisher }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Info -->
+          <div>
+            <!-- Appearance -->
+            <div class="info-section">
+              <h2 class="section-title">Apariencia</h2>
+              <div class="info-item">
+                <h3>Género</h3>
+                <p>{{ hero.appearance.gender }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Raza</h3>
+                <p>{{ hero.appearance.race || 'Desconocida' }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Altura</h3>
+                <p>{{ hero.appearance.height.join(' / ') || 'Desconocida' }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Peso</h3>
+                <p>{{ hero.appearance.weight.join(' / ') || 'Desconocida' }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Color de Ojos</h3>
+                <p>{{ hero.appearance.eyeColor }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Color de Cabello</h3>
+                <p>{{ hero.appearance.hairColor }}</p>
+              </div>
+            </div>
+
+            <!-- Work -->
+            <div class="info-section">
+              <h2 class="section-title">Trabajo</h2>
+              <div class="info-item">
+                <h3>Ocupación</h3>
+                <p>{{ hero.work.occupation }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Base de Operaciones</h3>
+                <p>{{ hero.work.base }}</p>
+              </div>
+            </div>
+
+            <!-- Connections -->
+            <div class="info-section">
+              <h2 class="section-title">Conexiones</h2>
+              <div class="info-item">
+                <h3>Afiliación de Grupo</h3>
+                <p>{{ hero.connections.groupAffiliation }}</p>
+              </div>
+              <div class="info-item">
+                <h3>Familiares</h3>
+                <p>{{ hero.connections.relatives }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
